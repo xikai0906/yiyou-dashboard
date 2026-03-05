@@ -53,12 +53,12 @@ with st.sidebar:
 # C端：家庭智能预约 (精细化服务与代际连接，强化匹配与积分抵扣)
 # ==========================================
 def render_c_end_home():
-    st.title("家庭照护一键预约   （双选时可使用老幼同乐服务）")
+    st.title("家庭照护一键预约")
     st.caption("科技赋能“一老一小”代际融合，解决长者孤独与幼儿托育痛点，重塑家庭连接")
     st.divider()
    
     # 模块 A：基础信息与精细化人群分层 (支持代际匹配评估)
-    st.subheader("1. 建立家庭服务档案")
+    st.subheader("1. 建立家庭服务档案   （双选时可使用老幼同乐服务）")
     col1, col2 = st.columns(2)
     with col1:
         senior_selected = st.checkbox("👴 长者 (Senior)")
