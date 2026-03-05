@@ -34,6 +34,7 @@ if 'family_members' not in st.session_state:
 # ==========================================
 with st.sidebar:
     st.markdown("**侧边栏调试：如果看到此句，侧边栏已渲染**")  # 调试提示
+    st.success("侧边栏加载成功！如果这里绿了，侧边栏OK")  # 额外醒目调试
     st.image("https://img.icons8.com/color/150/000000/family.png", width=60)
     st.markdown("### 颐幼全龄通系统")
     st.caption("东林养老院（玉林试点） | 响应“十五五”国家战略，科技赋能代际连接")
