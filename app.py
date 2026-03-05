@@ -9,9 +9,8 @@ from scipy import stats  # 用于计量模型相关性分析
 from plotly.subplots import make_subplots
 
 # ==========================================
-# 页面配置与全局样式（修复侧边栏Bug）
+# 页面配置与全局样式
 # ==========================================
-# 强制页面一加载就打开侧边栏
 st.set_page_config(
     page_title="颐幼全龄通 | 智能调度与预约", 
     page_icon="📱", 
@@ -19,14 +18,13 @@ st.set_page_config(
     initial_sidebar_state="expanded" 
 )
 
-# 修正 CSS 语法，保留 header 以确保侧边栏展开按钮可见
 hide_st_style = """
             <style>
             #MainMenu {visibility: hidden;}
             footer {visibility: hidden;}
             .main .block-container {padding-top: 2rem;}
-            /* 强制侧边栏最小宽度，确保内容不被挤压 */
-            section[data-testid="stSidebar"] {min-width: 250px !important;}  
+            /* 强制侧边栏最小宽度 */
+            section[data-testid="stSidebar"] {min-width: 280px !important;}  
             </style>
             """
 st.markdown(hide_st_style, unsafe_allow_html=True)
@@ -40,20 +38,44 @@ if 'vitality_points' not in st.session_state:
     st.session_state.vitality_points = 0
 if 'family_members' not in st.session_state:
     st.session_state.family_members = []
-# B端管理员登录状态
 if 'b_end_authenticated' not in st.session_state:
     st.session_state.b_end_authenticated = False
 
 # ==========================================
-# 侧边栏：系统视角切换
+# 侧边栏：系统视角切换 & 全局底座展示
 # ==========================================
 with st.sidebar:
     st.image("https://img.icons8.com/color/150/000000/family.png", width=60)
     st.markdown("### 颐幼全龄通系统")
-    st.caption("东林养老院（玉林试点） | 响应“十五五”国家战略，科技赋能代际连接")
+    st.caption("东林养老院（玉林试点） | 响应“十五五”战略，科技赋能代际连接")
+    
     view_mode = st.radio("切换系统视图：", ["📱 C端 - 家庭智能预约", "📊 B端 - 机构数据驾驶舱"])
+    
     st.divider()
+    
+    # 将底座支持移至侧边栏，并使用 Expander 隐藏复杂代码，保持美观
     st.markdown("🔒 **底座支持**：AIGC量化风控中台 & 物联网IoT监测 | 代际融合匹配模型")
+    
+    with st.expander("⚙️ 点击展开：底层技术白皮书", expanded=False):
+        st.markdown("**🧮 动态溢价数学模型**")
+        st.caption("基于 ARIMA 与需求弹性防挤兑")
+        st.latex(r''' P_t = P_0 \left(1 + \alpha \frac{\Delta D}{C}\right) ''')
+        
+        st.markdown("**🧬 代际特征匹配伪代码**")
+        st.code("""
+# 高维空间相似度与风险降维
+def match(senior, toddler):
+    sim = cosine_sim(vec_S, vec_T)
+    risk = eval_infection(S_id, T_id)
+    return sim - (alpha * risk)
+        """, language="python")
+        
+        st.markdown("**📡 IoT 微服务监控状态**")
+        st.progress(100, text="私立医院 HIS 绿码接口 (2ms)")
+        st.progress(98, text="穿戴设备 MQTT 延迟 (12ms)")
+        
+        st.markdown("**🛡️ 联邦学习合规引擎**")
+        st.success("端侧边缘计算：视频画面即刻销毁绝不上云，严格保护隐私。")
 
 # ==========================================
 # C端：家庭智能预约
@@ -63,7 +85,6 @@ def render_c_end_home():
     st.caption("科技赋能“一老一小”代际融合，解决长者孤独与幼儿托育痛点，重塑家庭连接")
     st.divider()
     
-    # 模块 A：建立家庭服务档案
     st.subheader("1. 建立家庭服务档案")
     col1, col2 = st.columns(2)
     with col1:
@@ -86,7 +107,6 @@ def render_c_end_home():
         st.session_state.family_members.append("幼儿")
     diet_pref = st.selectbox("个性化餐饮调度 (对接中央厨房)", ["常规营养均衡餐", "素食/无肉餐", "低脂低糖控糖餐", "流食/高能量软烂辅食"])
     
-    # 模块 B：下沉服务选项
     st.subheader("2. 核心增值服务")
     available_services = []
     
@@ -112,7 +132,6 @@ def render_c_end_home():
         
     selected_service = st.selectbox("选择具体服务项目", available_services)
     
-    # 模块 C：运力调度与时段
     st.subheader("3. 运力调度与时段")
     transport = st.radio("接送服务选择", [
         "家属自行接送",
@@ -127,7 +146,6 @@ def render_c_end_home():
         "全天场 08:30 - 17:00 (含三餐两点，代际互动时段)"
     ])
     
-    # 模块 D：医疗级安全承诺区
     st.divider()
     st.subheader("4. 健康申报与安全隔离承诺")
     with st.expander("🛡️ 查阅《东林康养：医疗级卫生与代际互动安全规范》", expanded=False):
@@ -138,12 +156,14 @@ def render_c_end_home():
         **4. 双向保险保障**：已包含交叉感染险与意外险
         """)
     
-    health_promise = st.checkbox("☑️ 我已阅读上述规范，并承诺本次预约家庭成员近期无发热、咳嗽及其他传染性疾病")
+    if 'health_promise' not in st.session_state:
+        st.session_state.health_promise = False
+    st.session_state.health_promise = st.checkbox("☑️ 我已阅读上述规范，并承诺本次预约家庭成员近期无发热、咳嗽及其他传染性疾病")
 
     st.divider()
     
     if st.button("生成预约方案与动态报价", use_container_width=True, type="primary"):
-        if not health_promise:
+        if not st.session_state.health_promise:
             st.error("⚠️ 请先勾选《健康申报与安全隔离承诺》，否则无法提交预约。这关乎园区每一位长者与幼儿的安全。")
             return
         
@@ -158,12 +178,10 @@ def render_c_end_home():
             if "+￥" in transport:
                 base_price += int(transport.split("+￥")[1].split(")")[0].replace("起", ""))
             
-            # 模拟计量定价与积分抵扣
             multiplier = 1.15 if "全天" in time_slot else 0.95
-            points_deduct = min(st.session_state.vitality_points // 10, base_price * 0.1)  # 积分抵扣最多10%
+            points_deduct = min(st.session_state.vitality_points // 10, base_price * 0.1)
             st.session_state.price = (base_price * multiplier) - points_deduct
             
-            # 代际互动积分激励 (时间银行概念)
             if "老幼同乐" in selected_service:
                 st.session_state.vitality_points += 50
                 st.info("✅ 代际时间银行激活：陪伴积分可抵扣护理/餐饮费，形成互助闭环")
@@ -198,13 +216,13 @@ def render_c_end_success():
     
     if st.button("返回首页，继续预约", use_container_width=True):
         st.session_state.page = 'home'
+        st.session_state.health_promise = False
         st.rerun()
 
 # ==========================================
 # B端：机构数据驾驶舱
 # ==========================================
 def render_b_end_dashboard():
-    # 顶部添加退出登录按钮和标题布局
     header_col1, header_col2 = st.columns([4, 1])
     with header_col1:
         st.title("机构运营驾驶舱")
@@ -218,15 +236,14 @@ def render_b_end_dashboard():
 
     st.divider()
     
-    # 顶部核心指标
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("今日总订单数", "128单", "12% 同比增长")
     col2.metric("当前护工配比缺口", "0人", "资源配置最优")
     col3.metric("预计日结流水", "￥18,450", "8.5% 溢价收益")
     col4.metric("代际匹配成功率", "92%", "转化率85%，复购72%")
     
-    # 多标签页面板（含最新加入的第三个技术底座标签页）
-    tab1, tab2, tab3 = st.tabs(["📈 床位需求预测与动态溢价", "🤝 代际融合量化与时间银行", "⚙️ 核心算法与 IoT 底座模型"])
+    # 恢复为两个标签页（底座展示已移至侧边栏）
+    tab1, tab2 = st.tabs(["📈 床位需求预测与动态溢价", "🤝 代际融合量化与时间银行"])
     
     with tab1:
         st.markdown("<span style='font-size: 0.85rem; color: gray;'>基于计量经济学时间序列模型，预测日内需求波动并触发调价指令。</span>", unsafe_allow_html=True)
@@ -298,44 +315,6 @@ def render_b_end_dashboard():
         })
         st.table(points_df)
 
-    with tab3:
-        st.subheader("底层技术中台揭秘")
-        st.markdown("系统并非简单的信息表单，而是由 **数理计量模型** 与 **物联网(IoT)微服务** 构成的复合底座。")
-        
-        subcol1, subcol2 = st.columns(2)
-        
-        with subcol1:
-            st.markdown("#### 🧮 1. 动态溢价算法核心 (数学模型)")
-            st.info("系统调用时间序列 ARIMA 模型与需求弹性方程进行实时调价，防止医疗资源挤兑。")
-            st.latex(r''' P_t = P_0 \times \left(1 + \alpha \frac{\max(0, D_t - C)}{C}\right) ''')
-            st.caption("Pt: 当前动态价格 | P0: 基准价格 | Dt: 实时需求热度 | C: 物理承载上限 | α: 风险阻尼系数")
-            
-            st.markdown("#### 🧬 2. 代际匹配特征降维 (算法伪代码)")
-            st.code("""
-# 基于高维特征空间相似度计算
-def match_generation(senior_features, toddler_needs):
-    # 提取长者特长标签向量与幼儿启蒙需求向量
-    vec_senior = extract_embeddings(senior_features)
-    vec_toddler = extract_embeddings(toddler_needs)
-    
-    # 计算余弦相似度并附加健康交叉感染风险惩罚项
-    similarity = cosine_sim(vec_senior, vec_toddler)
-    risk_penalty = compute_infection_risk(senior_id, toddler_id)
-    
-    match_score = similarity - (alpha * risk_penalty)
-    return match_score if match_score > 0.85 else None
-            """, language="python")
-
-        with subcol2:
-            st.markdown("#### 📡 3. 医疗物联网 IoT 接口状态")
-            st.markdown("全天候监控 API 连接池，实现物理空间与数字云端的纳秒级同步。")
-            st.progress(100, text="私立医院 HIS 系统绿码直连 (连接状态：STABLE)")
-            st.progress(98, text="长者防跌倒手环穿戴设备 MQTT 集群 (延迟: 12ms)")
-            st.progress(100, text="第三空间新风与紫外线中控台 (状态：ACTIVE)")
-            
-            st.markdown("#### 🛡️ 4. 数据脱敏与合规引擎")
-            st.success("✅ **联邦学习架构已激活**：情绪监控分析均在本地边缘计算终端完成，绝不上传家庭隐私视频流至云端，严格符合《个人信息保护法》。")
-
     st.divider()
 
     # 底部：医疗风控与防线
@@ -361,27 +340,22 @@ if view_mode == "📱 C端 - 家庭智能预约":
     elif st.session_state.page == 'success':
         render_c_end_success()
 else:
-    # 切换到 B 端时，先重置 C 端的页面状态
     st.session_state.page = 'home'
     
-    # 检查 B端 管理员登录状态
     if not st.session_state.b_end_authenticated:
-        # B端登录界面
         st.title("🔒 机构运营驾驶舱 - 访问受限")
         st.caption("检测到权限隔离，请输入系统管理员密码以进入数据中心。")
         st.divider()
         
-        # 使用 type="password" 隐藏输入字符
         pwd = st.text_input("管理员密码", type="password", placeholder="请输入 6 位数字密码")
         
         if st.button("🔐 登录管理后台", type="primary"):
             if pwd == "188988":
                 st.session_state.b_end_authenticated = True
                 st.success("密码验证通过！正在拉取底层数据，请稍候...")
-                time.sleep(0.8)  # 模拟加载延迟
+                time.sleep(0.8)
                 st.rerun()
             else:
                 st.error("❌ 密码错误，请确认您的系统管理员权限！")
     else:
-        # 验证通过，渲染完整驾驶舱
         render_b_end_dashboard()
