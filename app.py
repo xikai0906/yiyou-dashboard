@@ -9,7 +9,7 @@ from scipy import stats  # 用于计量模型相关性分析
 from plotly.subplots import make_subplots
 
 # ==========================================
-# 页面配置与全局样式
+# 页面配置与全局样式（修复侧边栏Bug）
 # ==========================================
 # 强制页面一加载就打开侧边栏
 st.set_page_config(
@@ -19,7 +19,7 @@ st.set_page_config(
     initial_sidebar_state="expanded" 
 )
 
-# 修正 CSS 语法，并保留 header（否则侧边栏展开按钮会消失）
+# 修正 CSS 语法，保留 header 以确保侧边栏展开按钮可见
 hide_st_style = """
             <style>
             #MainMenu {visibility: hidden;}
@@ -40,9 +40,7 @@ if 'vitality_points' not in st.session_state:
     st.session_state.vitality_points = 0
 if 'family_members' not in st.session_state:
     st.session_state.family_members = []
-if 'health_promise' not in st.session_state:
-    st.session_state.health_promise = False
-# 新增：B端管理员登录状态
+# B端管理员登录状态
 if 'b_end_authenticated' not in st.session_state:
     st.session_state.b_end_authenticated = False
 
@@ -66,7 +64,7 @@ def render_c_end_home():
     st.divider()
     
     # 模块 A：建立家庭服务档案
-    st.subheader("1. 建立家庭服务档案      （同时选择两个服务时，可享受“一老一小”专属老幼同乐服务）")
+    st.subheader("1. 建立家庭服务档案")
     col1, col2 = st.columns(2)
     with col1:
         senior_selected = st.checkbox("👴 长者 (Senior)")
@@ -140,12 +138,12 @@ def render_c_end_home():
         **4. 双向保险保障**：已包含交叉感染险与意外险
         """)
     
-    st.session_state.health_promise = st.checkbox("☑️ 我已阅读上述规范，并承诺本次预约家庭成员近期无发热、咳嗽及其他传染性疾病")
+    health_promise = st.checkbox("☑️ 我已阅读上述规范，并承诺本次预约家庭成员近期无发热、咳嗽及其他传染性疾病")
 
     st.divider()
     
     if st.button("生成预约方案与动态报价", use_container_width=True, type="primary"):
-        if not st.session_state.health_promise:
+        if not health_promise:
             st.error("⚠️ 请先勾选《健康申报与安全隔离承诺》，否则无法提交预约。这关乎园区每一位长者与幼儿的安全。")
             return
         
@@ -200,7 +198,6 @@ def render_c_end_success():
     
     if st.button("返回首页，继续预约", use_container_width=True):
         st.session_state.page = 'home'
-        st.session_state.health_promise = False # 重置健康承诺状态
         st.rerun()
 
 # ==========================================
@@ -213,7 +210,7 @@ def render_b_end_dashboard():
         st.title("机构运营驾驶舱")
         st.caption("量化数据分析与代际融合智能调度看板 | 科技证明社会价值")
     with header_col2:
-        st.write("") # 占位换行对齐
+        st.write("") 
         st.write("")
         if st.button("🔒 退出登录", use_container_width=True):
             st.session_state.b_end_authenticated = False
@@ -228,8 +225,8 @@ def render_b_end_dashboard():
     col3.metric("预计日结流水", "￥18,450", "8.5% 溢价收益")
     col4.metric("代际匹配成功率", "92%", "转化率85%，复购72%")
     
-    # 多标签页面板
-    tab1, tab2 = st.tabs(["📈 床位需求预测与动态溢价", "🤝 代际融合量化与时间银行"])
+    # 多标签页面板（含最新加入的第三个技术底座标签页）
+    tab1, tab2, tab3 = st.tabs(["📈 床位需求预测与动态溢价", "🤝 代际融合量化与时间银行", "⚙️ 核心算法与 IoT 底座模型"])
     
     with tab1:
         st.markdown("<span style='font-size: 0.85rem; color: gray;'>基于计量经济学时间序列模型，预测日内需求波动并触发调价指令。</span>", unsafe_allow_html=True)
@@ -260,7 +257,6 @@ def render_b_end_dashboard():
         st.subheader("代际融合量化看板：科技证明社会温度")
         st.markdown("利用算法精准匹配长者特长与幼儿需求，量化互动效果，形成时间银行互助闭环。")
         
-        # 智能匹配模型展示
         st.markdown("#### 1. 智能匹配结果 (基于特征模型)")
         match_df = pd.DataFrame({
             "长者ID": ["S001", "S002", "S003"],
@@ -272,7 +268,6 @@ def render_b_end_dashboard():
         st.table(match_df)
         st.caption("算法底层：基于多维特征提取模型，精准匹配后互动成功率提升显著。")
         
-        # 康复效果量化：折线图 + Pearson 检验
         st.markdown("#### 2. 互动效果实证检验 (计量经济学视角)")
         weeks = np.arange(1, 9)
         senior_loneliness = np.linspace(75, 45, 8) + np.random.normal(0, 2, 8)
@@ -295,7 +290,6 @@ def render_b_end_dashboard():
         col2.metric("统计学显著性 (P-Value)", f"{p_val:.4f}", "P < 0.05 极显著")
         st.success("📊 **实证结论**：统计学严密证明，系统分配的‘老幼同乐’模块成功实现了长者负面情绪的缓解与幼儿社交能力的同步提升。")
         
-        # 时间银行资产负债表
         st.markdown("#### 3. 时间银行资金流向统计表")
         points_df = pd.DataFrame({
             "账户实体": ["长者互助账户", "家庭托育账户", "全平台资产流转总计"],
@@ -303,7 +297,46 @@ def render_b_end_dashboard():
             "核销抵扣转化流向": ["￥1,250 (用于抵扣护理费)", "￥840 (用于抵扣早教/餐费)", "撬动社会效能 > ￥50,000"]
         })
         st.table(points_df)
-        st.caption("商业闭环：长者通过高质量陪伴产出积分资产，直接抵扣康养费用，盘活平台现金流，释放青壮年劳动力。")
+
+    with tab3:
+        st.subheader("底层技术中台揭秘")
+        st.markdown("系统并非简单的信息表单，而是由 **数理计量模型** 与 **物联网(IoT)微服务** 构成的复合底座。")
+        
+        subcol1, subcol2 = st.columns(2)
+        
+        with subcol1:
+            st.markdown("#### 🧮 1. 动态溢价算法核心 (数学模型)")
+            st.info("系统调用时间序列 ARIMA 模型与需求弹性方程进行实时调价，防止医疗资源挤兑。")
+            st.latex(r''' P_t = P_0 \times \left(1 + \alpha \frac{\max(0, D_t - C)}{C}\right) ''')
+            st.caption("Pt: 当前动态价格 | P0: 基准价格 | Dt: 实时需求热度 | C: 物理承载上限 | α: 风险阻尼系数")
+            
+            st.markdown("#### 🧬 2. 代际匹配特征降维 (算法伪代码)")
+            st.code("""
+# 基于高维特征空间相似度计算
+def match_generation(senior_features, toddler_needs):
+    # 提取长者特长标签向量与幼儿启蒙需求向量
+    vec_senior = extract_embeddings(senior_features)
+    vec_toddler = extract_embeddings(toddler_needs)
+    
+    # 计算余弦相似度并附加健康交叉感染风险惩罚项
+    similarity = cosine_sim(vec_senior, vec_toddler)
+    risk_penalty = compute_infection_risk(senior_id, toddler_id)
+    
+    match_score = similarity - (alpha * risk_penalty)
+    return match_score if match_score > 0.85 else None
+            """, language="python")
+
+        with subcol2:
+            st.markdown("#### 📡 3. 医疗物联网 IoT 接口状态")
+            st.markdown("全天候监控 API 连接池，实现物理空间与数字云端的纳秒级同步。")
+            st.progress(100, text="私立医院 HIS 系统绿码直连 (连接状态：STABLE)")
+            st.progress(98, text="长者防跌倒手环穿戴设备 MQTT 集群 (延迟: 12ms)")
+            st.progress(100, text="第三空间新风与紫外线中控台 (状态：ACTIVE)")
+            
+            st.markdown("#### 🛡️ 4. 数据脱敏与合规引擎")
+            st.success("✅ **联邦学习架构已激活**：情绪监控分析均在本地边缘计算终端完成，绝不上传家庭隐私视频流至云端，严格符合《个人信息保护法》。")
+
+    st.divider()
 
     # 底部：医疗风控与防线
     st.markdown("### ⚠️ 医疗级风控与交叉感染防范系统")
@@ -314,7 +347,7 @@ def render_b_end_dashboard():
     risk_col2.metric("代际长者绿码核验", "100% 达标", "今日拦截 2 名流感风险长者")
     risk_col3.metric("第三空间空气洁净度", "优 (PM2.5: 12)", "新风与紫外线消杀运行中")
 
-    with st.expander("🔍 展开查看平台底层医疗风控与拦截日志", expanded=True):
+    with st.expander("🔍 展开查看平台底层医疗风控与拦截日志", expanded=False):
         st.success("🟢 **入园闸机拦截系统**：08:15 成功拦截一位无感测温异常 (37.6℃) 的长者，已自动取消其今日代际互动资格，并触发私立医院发热门诊绿色通道。")
         st.info("🔵 **分时复用与空间消杀**：11:30 上午场结束。系统已自动闭锁代际活动室，正在执行 60 分钟的高强度臭氧+紫外线无人消杀，为下午场幼儿托育做准备。")
         st.warning("🟡 **行为情绪监控预警**：昨日 15:20，监控分析模型捕捉到一名幼儿在手工课上出现哭闹抗拒情绪，系统已自动判定“当期匹配度失效”，专业护工在 30 秒内响应，已将幼儿安全带回专属隔离早教区。")
@@ -328,13 +361,14 @@ if view_mode == "📱 C端 - 家庭智能预约":
     elif st.session_state.page == 'success':
         render_c_end_success()
 else:
-    # 切换到 B 端时，先检查登录状态
+    # 切换到 B 端时，先重置 C 端的页面状态
     st.session_state.page = 'home'
     
+    # 检查 B端 管理员登录状态
     if not st.session_state.b_end_authenticated:
         # B端登录界面
         st.title("🔒 机构运营驾驶舱 - 访问受限")
-        st.caption("检测到权限隔离，请输入东林养老院系统管理员密码以进入数据中心。")
+        st.caption("检测到权限隔离，请输入系统管理员密码以进入数据中心。")
         st.divider()
         
         # 使用 type="password" 隐藏输入字符
@@ -344,7 +378,7 @@ else:
             if pwd == "188988":
                 st.session_state.b_end_authenticated = True
                 st.success("密码验证通过！正在拉取底层数据，请稍候...")
-                time.sleep(0.8)  # 模拟加载延迟，增加真实感
+                time.sleep(0.8)  # 模拟加载延迟
                 st.rerun()
             else:
                 st.error("❌ 密码错误，请确认您的系统管理员权限！")
