@@ -49,7 +49,7 @@ with st.sidebar:
     st.markdown("### 颐幼全龄通系统")
     st.caption("东林养老院（玉林试点） | 响应“十五五”战略，科技赋能代际连接")
     
-    view_mode = st.radio("切换系统视图：", ["📱 C端 - 家庭智能预约", "📊 B端 - 机构数据驾驶舱"])
+    view_mode = st.radio("切换系统视图：", ["📱家庭智能预约", "📊 机构数据驾驶舱"])
     
     st.divider()
     
@@ -158,7 +158,7 @@ def render_c_end_home():
     
     if 'health_promise' not in st.session_state:
         st.session_state.health_promise = False
-    st.session_state.health_promise = st.checkbox("☑️ 我已阅读上述规范，并承诺本次预约家庭成员近期无发热、咳嗽及其他传染性疾病")
+    st.session_state.health_promise = st.checkbox("我已阅读上述规范，并承诺本次预约家庭成员近期无发热、咳嗽及其他传染性疾病")
 
     st.divider()
     
