@@ -1,0 +1,6 @@
+[server]
+enableCORS = false  # 禁用跨域，常见解决连接拒绝
+enableXsrfProtection = false  # 禁用XSRF保护，减少WebSocket错误
+enableWebsocketCompression = false  # 禁用压缩，改善兼容性
+headless = true  # 无头模式，云端必需
+port = 8501  # 默认端口，保持不变
