@@ -7,12 +7,6 @@ import plotly.express as px
 import plotly.graph_objects as go
 from scipy import stats  # 用于计量模型相关性分析
 from plotly.subplots import make_subplots
-# 添加这些优化设置（云端运行时生效）
-st.set_option('server.enableCORS', False)
-st.set_option('server.enableXsrfProtection', False)
-st.set_option('server.enableWebsocketCompression', False)
-st.set_option('server.headless', True)
-
 # ==========================================
 # 页面配置与全局样式
 # ==========================================
