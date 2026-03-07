@@ -84,7 +84,7 @@ def render_c_end_home():
     st.caption("科技赋能“一老一小”代际融合，解决长者孤独与幼儿托育痛点，重塑家庭连接")
     st.divider()
     
-    st.subheader("1. 建立家庭服务档案")
+    st.subheader("1. 建立家庭服务档案    （同时选择时可以享受“老幼同乐服务”）")
     col1, col2 = st.columns(2)
     with col1:
         senior_selected = st.checkbox("👴 长者 (Senior)")
